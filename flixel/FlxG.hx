@@ -191,7 +191,8 @@ class FlxG
 	 * Used for mouse input. e.g.: check if the left mouse button
 	 * is pressed with `if (FlxG.mouse.pressed) { })` in `update()`.
 	 */
-	public static var mouse(default, set):FlxMouse;
+	private static var _mouse: FlxMouse;
+	public static var mouse(get, set):FlxMouse;
 	#end
 	
 	#if FLX_TOUCH
@@ -213,6 +214,7 @@ class FlxG
 	 * Used for keyboard input e.g.: check if the left arrow key is
 	 * pressed with `if (FlxG.keys.pressed.LEFT) { }` in `update()`.
 	 */
+	private static var _keys: FlxKeyboard;
 	public static var keys(default, null):FlxKeyboard;
 	#end
 	
@@ -674,22 +676,50 @@ class FlxG
 	}
 	
 	#if FLX_MOUSE
+	static function get_mouse(): FlxMouse
+	{
+		return _mouse;
+	}
+	
 	static function set_mouse(NewMouse:FlxMouse):FlxMouse
 	{
-		if (mouse == null) // if no mouse, just add it
+		if (_mouse == null) // if no mouse, just add it
 		{
-			mouse = inputs.add(NewMouse); // safe to do b/c it won't add repeats!
+			_mouse = inputs.add(NewMouse); // safe to do b/c it won't add repeats!
 			return mouse;
 		}
 		var oldMouse:FlxMouse = mouse;
 		var result:FlxMouse = inputs.replace(oldMouse, NewMouse); // replace existing mouse
 		if (result != null)
 		{
-			mouse = result;
+			_mouse = result;
 			oldMouse.destroy();
 			return NewMouse;
 		}
 		return oldMouse;
+	}
+	
+	public static function setMouseReference(newMouse:FlxMouse)
+	{
+		_mouse = newMouse;
+	}
+	#end
+	
+	#if FLX_KEYBOARD
+	static function get_keys():FlxKeyboard
+	{
+		return _keys;
+	}
+	
+	static function set_keys(NewKeys:FlxKeyboard):FlxKeyboard
+	{
+		_keys = NewKeys;
+		return _keys;
+	}
+	
+	public static function setKeyboardReference(NewKeys:FlxKeyboard)
+	{
+		_keys = NewKeys;
 	}
 	#end
 	
